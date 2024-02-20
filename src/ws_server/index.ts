@@ -1,14 +1,17 @@
+import { MESSAGE } from './models/consts';
 import { WebSocketServer, WebSocket } from 'ws';
+import { handleCommands } from './commands/handleCommands';
 
 export function wsServer() {
   const WS_PORT = 3000;
   const wss = new WebSocketServer({ port: WS_PORT });
   wss.on('connection', (ws: WebSocket) => {
-    console.log('New client connected');
+    console.log(MESSAGE.NEW_CLIENT);
     ws.on('message', (message: string) => {
-      console.log(`${message}`);
-      ws.send(`Answer : ${message}`);
+      console.log(wss.clients.size);
+      const response = handleCommands(message);
+      ws.send(JSON.stringify(response));
     });
   });
-  console.log('start server on 3000 port');
+  console.log(MESSAGE.START_SERVER);
 }
