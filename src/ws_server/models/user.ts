@@ -5,5 +5,5 @@ export interface User {
   id: number;
   password: string;
   socket: WebSocket | undefined;
-  winners: number;
+  wins: number;
 }

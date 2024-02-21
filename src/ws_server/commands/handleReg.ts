@@ -5,24 +5,28 @@ import { generateHash } from 'ws_server/helpers/generateHash';
 import { ResponseType } from 'ws_server/models/response';
 import { ERROR } from 'ws_server/models/consts';
 
-import { users } from 'ws_server/store';
+import { activeConnect, users } from 'ws_server/store';
 
 export function handleReg(data: string, socket: WebSocket): ResponseReg {
   const { name, password } = JSON.parse(data);
   if (!users.has(name)) registration(name, password);
-  let responseData: ResponseRegData;
+  const responseData: ResponseRegData = {
+    name: '',
+    index: 0,
+    error: false,
+    errorText: '',
+  };
   if (authentication(name, password)) {
     const temp_user = users.get(name)!;
     temp_user['socket'] = socket;
-    responseData = {
-      name: temp_user.name,
-      index: temp_user.id,
-      error: false,
-      errorText: '',
-    };
+    responseData.name = temp_user.name;
+    responseData.index = temp_user.id;
+    activeConnect.set(socket, temp_user.name);
   } else {
-    responseData = { name: '', index: 0, error: true, errorText: ERROR.LOGIN };
+    responseData.error = true;
+    responseData.errorText = ERROR.LOGIN;
   }
+
   const answer = JSON.stringify(responseData);
   return { type: ResponseType.REG, data: answer, id: 0 };
 }
@@ -37,6 +41,6 @@ function registration(user: string, password: string) {
     password: generateHash(password),
     id: users.size + 1,
     socket: undefined,
-    winners: 0,
+    wins: 0,
   });
 }

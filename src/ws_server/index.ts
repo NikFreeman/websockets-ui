@@ -8,7 +8,6 @@ export function wsServer() {
   wss.on('connection', (ws: WebSocket) => {
     console.log(MESSAGE.NEW_CLIENT);
     ws.on('message', (message: string) => {
-      console.log(wss.clients.size);
       const response = handleCommands(message, ws);
       ws.send(JSON.stringify(response));
     });
