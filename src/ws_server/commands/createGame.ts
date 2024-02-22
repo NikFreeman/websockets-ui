@@ -1,4 +1,5 @@
 import { createBattleField } from 'ws_server/helpers/createBattleField';
+import { sendMessage } from 'ws_server/helpers/sendMessage';
 import { ResponseType } from 'ws_server/models/response';
 import { Game, Rival, gameCounter, games, rooms } from 'ws_server/store';
 
@@ -13,32 +14,25 @@ export function createGame(indexRoom: number) {
     const field = createBattleField();
     const rival: Rival = {
       player: elem,
+      ready: false,
+      ships: [],
       battleField: field,
     };
     rivals.push(rival);
   });
   const game: Game = {
     id: id,
+    currentPlayer: -1,
     rivals: rivals,
   };
   games.push(game);
 
   game?.rivals.forEach((rival) => {
-    const socket = rival.player.socket!;
     const idPlayer = rival.player.id;
-    const respData = {
-      data: {
-        idGame: id,
-        idPlayer: idPlayer,
-      },
-    };
-    const answer = JSON.stringify(respData);
-    socket.send(
-      JSON.stringify({
-        type: ResponseType.CREATE_GAME,
-        data: answer,
-        id: 0,
-      }),
-    );
+    const responseData = JSON.stringify({
+      idGame: id,
+      idPlayer: idPlayer,
+    });
+    sendMessage(ResponseType.CREATE_GAME, responseData, rival.player.socket!);
   });
 }
