@@ -1,4 +1,5 @@
 import { WebSocket } from 'ws';
+import { Ships } from 'ws_server/models/ships';
 import { User } from 'ws_server/models/user';
 
 export const users = new Map<string, User>();
@@ -20,10 +21,13 @@ export interface Room {
 
 export interface Game {
   id: number;
+  currentPlayer: number;
   rivals: Rival[];
 }
 
 export interface Rival {
   player: User;
+  ready: boolean;
+  ships: Array<Ships>;
   battleField: number[][];
 }

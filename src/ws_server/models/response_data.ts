@@ -1,4 +1,5 @@
-import { ResponseType } from './response';
+import { AttackStatus } from './board';
+import { Position } from './ships';
 
 export interface ResponseRegData {
   name: string;
@@ -7,8 +8,8 @@ export interface ResponseRegData {
   errorText: string;
 }
 
-export interface ResponseReg {
-  type: ResponseType;
-  data: string;
-  id: number;
+export interface ResponseAttackData {
+  position: Position;
+  currentPlayer: number;
+  status: AttackStatus;
 }

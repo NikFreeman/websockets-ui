@@ -3,16 +3,24 @@ import { WebSocketServer, WebSocket } from 'ws';
 
 import { RequestType } from './models/request';
 import { reg } from './commands/reg';
-import { updateRoom } from './commands/updateRooms';
+import { updateRooms } from './commands/updateRooms';
 import { createRoom } from './commands/createRoom';
 import { addUser } from './commands/addUser';
 
 import { createGame } from './commands/createGame';
+import { addShips } from './commands/addShips';
+import { sendMessage } from './helpers/sendMessage';
+import { ResponseType } from './models/response';
+import { attack } from './commands/attack';
 
 export function wsServer() {
   function sendUpdateRoom() {
-    const response = updateRoom();
-    wss.clients.forEach((client) => client.send(JSON.stringify(response)));
+    const response = updateRooms();
+    wss.clients.forEach((client) => {
+      if (client.readyState == WebSocket.OPEN) {
+        sendMessage(ResponseType.UPDATE_ROOM, response, client);
+      }
+    });
   }
 
   const WS_PORT = 3000;
@@ -25,7 +33,7 @@ export function wsServer() {
       switch (type) {
         case RequestType.REG:
           const response = reg(data, ws);
-          ws.send(JSON.stringify(response));
+          sendMessage(ResponseType.REG, response, ws);
           sendUpdateRoom();
           break;
 
@@ -41,6 +49,13 @@ export function wsServer() {
           createGame(indexRoom);
           break;
         case RequestType.ADD_SHIPS:
+          addShips(data);
+          break;
+        case RequestType.ATTACK:
+          console.log(data);
+          attack(data);
+          break;
+        case RequestType.RANDOM_ATTACK:
           console.log(data);
           break;
         case RequestType.SINGLE_PLAY:
