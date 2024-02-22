@@ -1,13 +1,12 @@
 import WebSocket from 'ws';
-
-import { ResponseReg, ResponseRegData } from 'ws_server/models/response_data';
+import { ResponseRegData } from 'ws_server/models/response_data';
 import { generateHash } from 'ws_server/helpers/generateHash';
-import { ResponseType } from 'ws_server/models/response';
+
 import { ERROR } from 'ws_server/models/consts';
 
 import { activeConnect, users } from 'ws_server/store';
 
-export function reg(data: string, socket: WebSocket): ResponseReg {
+export function reg(data: string, socket: WebSocket): string {
   const { name, password } = JSON.parse(data);
   if (!users.has(name)) registration(name, password);
   const responseData: ResponseRegData = {
@@ -28,7 +27,7 @@ export function reg(data: string, socket: WebSocket): ResponseReg {
   }
 
   const answer = JSON.stringify(responseData);
-  return { type: ResponseType.REG, data: answer, id: 0 };
+  return answer;
 }
 
 function authentication(user: string, password: string): boolean {
