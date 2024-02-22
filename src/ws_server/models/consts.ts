@@ -4,7 +4,7 @@ export enum ERROR {
 }
 
 export enum MESSAGE {
-  START_SERVER = 'Start websoket server',
+  START_SERVER = 'Start websoket server on the PORT port!',
   NEW_CLIENT = 'New client connected',
 }
 

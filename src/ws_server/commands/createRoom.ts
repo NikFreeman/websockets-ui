@@ -1,7 +1,7 @@
 import { WebSocket } from 'ws';
 import { activeConnect, roomCounter, rooms, users } from 'ws_server/store';
 
-export function handleCreateRoom(socket: WebSocket) {
+export function createRoom(socket: WebSocket) {
   const player = users.get(activeConnect.get(socket)!)!;
   if (
     !rooms.some((item) => {
@@ -11,5 +11,4 @@ export function handleCreateRoom(socket: WebSocket) {
     const id = (roomCounter.counter = roomCounter.counter + 1);
     rooms.push({ id: id, players: [player] });
   }
-  console.log(rooms);
 }

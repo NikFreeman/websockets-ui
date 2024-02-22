@@ -7,7 +7,7 @@ import { ERROR } from 'ws_server/models/consts';
 
 import { activeConnect, users } from 'ws_server/store';
 
-export function handleReg(data: string, socket: WebSocket): ResponseReg {
+export function reg(data: string, socket: WebSocket): ResponseReg {
   const { name, password } = JSON.parse(data);
   if (!users.has(name)) registration(name, password);
   const responseData: ResponseRegData = {
