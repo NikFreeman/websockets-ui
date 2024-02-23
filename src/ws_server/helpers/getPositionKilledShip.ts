@@ -5,38 +5,29 @@ export function getPositionKilledShip(
   position: Position,
   realBoard: number[][],
 ): Set<Position> {
+  function updatePosKilledShip(x: number, y: number) {
+    if (board![y]![x] == CellState.SHOTED) {
+      getPositionKilledShip({ x: x, y: y }, board!).forEach((pos) =>
+        result.add(pos),
+      );
+    }
+  }
   const board = JSON.parse(JSON.stringify(realBoard));
   const result = new Set<Position>();
   const { x, y } = position;
   result.add({ x, y });
   board[y][x] = -1;
   if (y > 0) {
-    if (board![y - 1]![x] == CellState.SHOTED) {
-      getPositionKilledShip({ x: x, y: y - 1 }, board!).forEach((pos) =>
-        result.add(pos),
-      );
-    }
+    updatePosKilledShip(x, y - 1);
   }
   if (x < 9) {
-    if (board![y]![x + 1] == CellState.SHOTED) {
-      getPositionKilledShip({ x: x + 1, y: y }, board!).forEach((pos) =>
-        result.add(pos),
-      );
-    }
+    updatePosKilledShip(x + 1, y);
   }
   if (y < 9) {
-    if (board![y + 1]![x] == CellState.SHOTED) {
-      getPositionKilledShip({ x: x, y: y + 1 }, board!).forEach((pos) =>
-        result.add(pos),
-      );
-    }
+    updatePosKilledShip(x, y + 1);
   }
   if (x > 0) {
-    if (board![y]![x - 1] == CellState.SHOTED) {
-      getPositionKilledShip({ x: x - 1, y: y }, board!).forEach((pos) =>
-        result.add(pos),
-      );
-    }
+    updatePosKilledShip(x - 1, y);
   }
   return result;
 }

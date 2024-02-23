@@ -6,32 +6,32 @@ export function checkKilled(
   realBoard: number[][],
 ): boolean {
   const board = JSON.parse(JSON.stringify(realBoard));
-
+  let killed = true;
   const { x, y } = position;
   board[y][x] = -1;
   if (y > 0) {
     if (board![y - 1]![x] == CellState.DESK) {
       return false;
     } else if (board![y - 1]![x] == CellState.SHOTED)
-      return checkKilled({ x: x, y: y - 1 }, board!);
+      killed = checkKilled({ x: x, y: y - 1 }, board!);
   }
   if (x < 9) {
     if (board![y]![x + 1] == CellState.DESK) {
       return false;
     } else if (board![y]![x + 1] == CellState.SHOTED)
-      return checkKilled({ x: x + 1, y: y }, board!);
+      killed = checkKilled({ x: x + 1, y: y }, board!);
   }
   if (y < 9) {
     if (board![y + 1]![x] == CellState.DESK) {
       return false;
     } else if (board![y + 1]![x] == CellState.SHOTED)
-      return checkKilled({ x: x, y: y + 1 }, board!);
+      killed = checkKilled({ x: x, y: y + 1 }, board!);
   }
   if (x > 0) {
     if (board![y]![x - 1] == CellState.DESK) {
       return false;
     } else if (board![y]![x - 1] == CellState.SHOTED)
-      return checkKilled({ x: x - 1, y: y }, board!);
+      killed = checkKilled({ x: x - 1, y: y }, board!);
   }
-  return true;
+  return killed;
 }

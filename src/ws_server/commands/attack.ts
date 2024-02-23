@@ -44,10 +44,12 @@ export function attack(data: string) {
     }
     if (cell == CellState.DESK) {
       board![y]![x] = CellState.SHOTED;
-      console.log('killed: ', checkKilled({ x, y }, board!));
+
       if (checkKilled({ x, y }, board!)) {
+        const positionKilledShip = getPositionKilledShip({ x, y }, board!);
+        const positionMissAroundShip = getAroundKilledShip({ x, y }, board!);
         games[indexGame]!.rivals.forEach((rival) => {
-          getPositionKilledShip({ x, y }, board!).forEach((pos) => {
+          positionKilledShip.forEach((pos) => {
             const responseData: ResponseAttackData = {
               position: pos,
               currentPlayer: indexPlayer,
@@ -59,9 +61,11 @@ export function attack(data: string) {
               rival.player.socket!,
             );
           });
-          getAroundKilledShip({ x, y }, board!).forEach((pos) => {
+
+          positionMissAroundShip.forEach((pos) => {
             const { x, y } = pos;
             board![y]![x] = CellState.MISSED;
+
             const responseData: ResponseAttackData = {
               position: pos,
               currentPlayer: indexPlayer,
