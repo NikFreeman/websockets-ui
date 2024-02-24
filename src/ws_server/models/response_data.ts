@@ -13,3 +13,7 @@ export interface ResponseAttackData {
   currentPlayer: number;
   status: AttackStatus;
 }
+
+export interface ResponseFinishData {
+  winPlayer: number;
+}

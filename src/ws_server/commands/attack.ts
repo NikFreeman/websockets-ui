@@ -6,8 +6,11 @@ import { games } from 'ws_server/store';
 import { checkKilled } from 'ws_server/helpers/checkKilled';
 import { getPositionKilledShip } from 'ws_server/helpers/getPositionKilledShip';
 import { getAroundKilledShip } from 'ws_server/helpers/getAroundKilledShip';
+import { countCellState } from 'ws_server/helpers/countCellState';
+import { finishMessage } from './finish';
 
 export function attack(data: string) {
+  console.log(data);
   const { gameId, x, y, indexPlayer } = JSON.parse(data);
   const indexGame = games.findIndex((elem) => elem.id === gameId);
   if (indexGame == -1) throw new Error('not Game');
@@ -48,6 +51,7 @@ export function attack(data: string) {
       if (checkKilled({ x, y }, board!)) {
         const positionKilledShip = getPositionKilledShip({ x, y }, board!);
         const positionMissAroundShip = getAroundKilledShip({ x, y }, board!);
+        const finish = countCellState([CellState.DESK], board!) == 0;
         games[indexGame]!.rivals.forEach((rival) => {
           positionKilledShip.forEach((pos) => {
             const responseData: ResponseAttackData = {
@@ -81,6 +85,9 @@ export function attack(data: string) {
             currentPlayer: indexPlayer,
           });
           sendMessage(ResponseType.TURN, responseTurn, rival.player.socket!);
+          if (finish) {
+            finishMessage(indexPlayer, rival.player.socket!);
+          }
         });
       } else {
         games[indexGame]!.rivals.forEach((rival) => {

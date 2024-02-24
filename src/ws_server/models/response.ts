@@ -5,4 +5,5 @@ export enum ResponseType {
   START_GAME = 'start_game',
   TURN = 'turn',
   ATTACK = 'attack',
+  FINISH = 'finish',
 }

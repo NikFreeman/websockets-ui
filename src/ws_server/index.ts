@@ -12,6 +12,7 @@ import { addShips } from './commands/addShips';
 import { sendMessage } from './helpers/sendMessage';
 import { ResponseType } from './models/response';
 import { attack } from './commands/attack';
+import { randomAttack } from './commands/randomAttack';
 
 export function wsServer() {
   function sendUpdateRoom() {
@@ -52,11 +53,11 @@ export function wsServer() {
           addShips(data);
           break;
         case RequestType.ATTACK:
-          console.log(data);
           attack(data);
           break;
         case RequestType.RANDOM_ATTACK:
           console.log(data);
+          randomAttack(data);
           break;
         case RequestType.SINGLE_PLAY:
           console.log('bot');
