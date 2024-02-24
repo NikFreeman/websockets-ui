@@ -2,7 +2,7 @@ import { sendMessage } from 'ws_server/helpers/sendMessage';
 import { ResponseAttackData } from './../models/response_data';
 import { AttackStatus, CellState } from 'ws_server/models/board';
 import { ResponseType } from 'ws_server/models/response';
-import { games } from 'ws_server/store';
+import { games, users } from 'ws_server/store';
 import { checkKilled } from 'ws_server/helpers/checkKilled';
 import { getPositionKilledShip } from 'ws_server/helpers/getPositionKilledShip';
 import { getAroundKilledShip } from 'ws_server/helpers/getAroundKilledShip';
@@ -87,6 +87,9 @@ export function attack(data: string) {
           sendMessage(ResponseType.TURN, responseTurn, rival.player.socket!);
           if (finish) {
             finishMessage(indexPlayer, rival.player.socket!);
+            users.get(rival.player.name)!.wins =
+              users.get(rival.player.name)!.wins + 1;
+            games.splice(indexGame, 1);
           }
         });
       } else {

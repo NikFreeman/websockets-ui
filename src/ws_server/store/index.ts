@@ -13,28 +13,33 @@ export const roomCounter = { counter: 0 };
 
 export const gameCounter = { counter: 0 };
 
-export interface Room {
+export type Room = {
   id: number;
   players: User[];
-}
+};
 
-export interface Game {
+export type Game = {
   id: number;
   currentPlayer: number;
   rivals: Rival[];
-}
+};
 
-export interface Rival {
+export type Rival = {
   player: User;
   ready: boolean;
   ships: Array<Ships>;
   battleField: number[][];
-}
+};
 
-export interface User {
+export type User = {
   name: string;
   id: number;
   password: string;
   socket: WebSocket | null;
   wins: number;
-}
+};
+
+export type Winner = {
+  name: string;
+  wins: number;
+};

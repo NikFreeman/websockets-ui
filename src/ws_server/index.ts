@@ -14,19 +14,11 @@ import { ResponseType } from './models/response';
 import { attack } from './commands/attack';
 import { randomAttack } from './commands/randomAttack';
 import { closeConnection } from './commands/closeConnection';
+import { updateWinners } from './commands/updateWinners';
+import { sendToEveryone } from './helpers/sendToEveryone';
 
-export function wsServer() {
-  function sendUpdateRoom() {
-    const response = updateRooms();
-    wss.clients.forEach((client) => {
-      if (client.readyState == WebSocket.OPEN) {
-        sendMessage(ResponseType.UPDATE_ROOM, response, client);
-      }
-    });
-  }
-
-  const WS_PORT = 3000;
-  const wss = new WebSocketServer({ port: WS_PORT });
+export function wsServer(ws_port: number = 3000) {
+  const wss = new WebSocketServer({ port: ws_port });
   wss.on('connection', (ws: WebSocket) => {
     console.log(MESSAGE.NEW_CLIENT);
     ws.on('message', (message: string) => {
@@ -36,18 +28,19 @@ export function wsServer() {
         case RequestType.REG:
           const response = reg(data, ws);
           sendMessage(ResponseType.REG, response, ws);
-          sendUpdateRoom();
+          sendToEveryone(wss, ResponseType.UPDATE_ROOM, updateRooms());
+          sendToEveryone(wss, ResponseType.UPDATE_WINNERS, updateWinners());
           break;
 
         case RequestType.CREATE_ROOM:
           createRoom(ws);
-          sendUpdateRoom();
+          sendToEveryone(wss, ResponseType.UPDATE_ROOM, updateRooms());
           break;
 
         case RequestType.ADD_USER:
           const { indexRoom } = JSON.parse(data);
           addUser(indexRoom, ws);
-          sendUpdateRoom();
+          sendToEveryone(wss, ResponseType.UPDATE_ROOM, updateRooms());
           createGame(indexRoom);
           break;
         case RequestType.ADD_SHIPS:
@@ -70,6 +63,10 @@ export function wsServer() {
     ws.on('close', (socket: WebSocket) => {
       closeConnection(socket);
     });
+
+    ws.on('error', (socket: WebSocket, error: Error) => {
+      console.log('Error', error.message, socket);
+    });
   });
-  console.log(MESSAGE.START_SERVER.replace('PORT', String(WS_PORT)));
+  console.log(MESSAGE.START_SERVER.replace('PORT', String(ws_port)));
 }

@@ -6,4 +6,5 @@ export enum ResponseType {
   TURN = 'turn',
   ATTACK = 'attack',
   FINISH = 'finish',
+  UPDATE_WINNERS = 'update_winners',
 }
