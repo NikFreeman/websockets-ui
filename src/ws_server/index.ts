@@ -13,6 +13,7 @@ import { sendMessage } from './helpers/sendMessage';
 import { ResponseType } from './models/response';
 import { attack } from './commands/attack';
 import { randomAttack } from './commands/randomAttack';
+import { closeConnection } from './commands/closeConnection';
 
 export function wsServer() {
   function sendUpdateRoom() {
@@ -65,6 +66,9 @@ export function wsServer() {
         default:
           console.log(`unknown command: ${type}`);
       }
+    });
+    ws.on('close', (socket: WebSocket) => {
+      closeConnection(socket);
     });
   });
   console.log(MESSAGE.START_SERVER.replace('PORT', String(WS_PORT)));
