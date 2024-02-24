@@ -16,11 +16,10 @@ export function reg(data: string, socket: WebSocket): string {
     errorText: '',
   };
   if (authentication(name, password)) {
-    const temp_user = users.get(name)!;
-    temp_user['socket'] = socket;
-    responseData.name = temp_user.name;
-    responseData.index = temp_user.id;
-    activeConnect.set(socket, temp_user.name);
+    users.get(name)!['socket'] = socket;
+    responseData.name = users.get(name)!.name;
+    responseData.index = users.get(name)!.id;
+    activeConnect.set(socket, users.get(name)!.name);
   } else {
     responseData.error = true;
     responseData.errorText = ERROR.LOGIN;
@@ -39,7 +38,7 @@ function registration(user: string, password: string) {
     name: user,
     password: generateHash(password),
     id: users.size + 1,
-    socket: undefined,
+    socket: null,
     wins: 0,
   });
 }

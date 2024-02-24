@@ -35,4 +35,5 @@ export function createGame(indexRoom: number) {
     });
     sendMessage(ResponseType.CREATE_GAME, responseData, rival.player.socket!);
   });
+  rooms.splice(indexRoom, 1);
 }

@@ -6,5 +6,5 @@ export function sendMessage(
   data: string,
   socket: WebSocket,
 ) {
-  socket.send(JSON.stringify({ type: type, data: data, id: 0 }));
+  if (socket) socket.send(JSON.stringify({ type: type, data: data, id: 0 }));
 }
