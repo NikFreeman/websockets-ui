@@ -9,3 +9,8 @@ export enum MESSAGE {
 }
 
 export const MAX_USERS_IN_ROOM = 2;
+
+export const bot = {
+  name: 'SkyNet',
+  password: 'password',
+};

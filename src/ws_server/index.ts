@@ -17,6 +17,7 @@ import { closeConnection } from './commands/closeConnection';
 import { updateWinners } from './commands/updateWinners';
 import { sendToEveryone } from './helpers/sendToEveryone';
 import { activeConnect, finishGame } from './store';
+import { addBot } from './commands/addBot';
 
 export function wsServer(ws_port: number = 3000) {
   const wss = new WebSocketServer({ port: ws_port });
@@ -62,6 +63,8 @@ export function wsServer(ws_port: number = 3000) {
           break;
         case RequestType.SINGLE_PLAY:
           console.log('bot');
+          createRoom(ws);
+          addBot(ws);
           break;
         default:
           console.log(`unknown command: ${type}`);
@@ -71,8 +74,8 @@ export function wsServer(ws_port: number = 3000) {
       if (activeConnect.has(ws)) closeConnection(ws);
     });
 
-    ws.on('error', (socket: WebSocket, error: Error) => {
-      console.log('Error', error.message, socket);
+    ws.on('error', (error: Error) => {
+      console.log('Error', error.message);
     });
   });
   console.log(MESSAGE.START_SERVER.replace('PORT', String(ws_port)));

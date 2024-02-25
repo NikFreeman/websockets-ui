@@ -12,6 +12,8 @@ import { getAroundKilledShip } from 'ws_server/helpers/getAroundKilledShip';
 import { countCellState } from 'ws_server/helpers/countCellState';
 
 import { sendToGameParticipants } from 'ws_server/helpers/sendToGameParticipants';
+import { bot } from 'ws_server/models/consts';
+import { randomAttack } from './randomAttack';
 
 export function attack(data: string) {
   const { gameId, x, y, indexPlayer } = JSON.parse(data);
@@ -57,6 +59,12 @@ export function attack(data: string) {
         ResponseType.TURN,
         responseTurn,
       );
+      if (users.has(bot.name))
+        if (games[indexGame]!.currentPlayer == users.get(bot.name!)!.id) {
+          randomAttack(
+            JSON.stringify({ gameId: gameId, indexPlayer: idRival }),
+          );
+        }
     }
     //Shot
     if (cell == CellState.DESK) {
@@ -105,7 +113,12 @@ export function attack(data: string) {
           ResponseType.TURN,
           responseTurn,
         );
-
+        if (users.has(bot.name))
+          if (games[indexGame]!.currentPlayer == users.get(bot.name)!.id) {
+            randomAttack(
+              JSON.stringify({ gameId: gameId, indexPlayer: indexPlayer }),
+            );
+          }
         if (finish) {
           const responseFinish: ResponseFinishData = {
             winPlayer: indexPlayer,
@@ -143,6 +156,12 @@ export function attack(data: string) {
           ResponseType.TURN,
           responseTurn,
         );
+        if (users.has(bot.name))
+          if (games[indexGame]!.currentPlayer == users.get(bot.name)!.id) {
+            randomAttack(
+              JSON.stringify({ gameId: gameId, indexPlayer: indexPlayer }),
+            );
+          }
       }
     }
   }

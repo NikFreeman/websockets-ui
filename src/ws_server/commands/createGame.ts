@@ -9,7 +9,6 @@ export function createGame(indexRoom: number) {
   });
   const id = (gameCounter.counter = gameCounter.counter + 1);
   const rivals: Rival[] = [];
-
   room?.players.forEach((elem) => {
     const field = createBattleField();
     const rival: Rival = {
@@ -35,11 +34,9 @@ export function createGame(indexRoom: number) {
     });
     sendMessage(ResponseType.CREATE_GAME, responseData, rival.player.socket!);
   });
-  console.table(rooms);
+
   const indexDeleteRoom = rooms.findIndex((elem) => {
     return elem.id == indexRoom;
   });
-  console.log(indexDeleteRoom);
   rooms.splice(indexDeleteRoom, 1);
-  console.table(rooms);
 }

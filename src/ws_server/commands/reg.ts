@@ -6,7 +6,7 @@ import { ERROR } from 'ws_server/models/consts';
 
 import { activeConnect, users } from 'ws_server/store';
 
-export function reg(data: string, socket: WebSocket): string {
+export function reg(data: string, socket: WebSocket | null): string {
   const { name, password } = JSON.parse(data);
   if (!users.has(name)) registration(name, password);
   const responseData: ResponseRegData = {
@@ -19,7 +19,7 @@ export function reg(data: string, socket: WebSocket): string {
     users.get(name)!['socket'] = socket;
     responseData.name = users.get(name)!.name;
     responseData.index = users.get(name)!.id;
-    activeConnect.set(socket, users.get(name)!.name);
+    if (socket) activeConnect.set(socket, users.get(name)!.name);
   } else {
     responseData.error = true;
     responseData.errorText = ERROR.LOGIN;

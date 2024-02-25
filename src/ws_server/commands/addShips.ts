@@ -5,7 +5,9 @@ import { Ships } from 'ws_server/models/ships';
 import { games } from 'ws_server/store';
 
 export function addShips(data: string) {
+  console.log(data);
   const { gameId, ships, indexPlayer } = JSON.parse(data);
+  console.log(ships);
   const indexGame = games.findIndex((elem) => elem.id === gameId);
   if (indexGame == -1) throw new Error('not Game');
   const indexRival = games[indexGame]!.rivals.findIndex(
