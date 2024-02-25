@@ -35,5 +35,11 @@ export function createGame(indexRoom: number) {
     });
     sendMessage(ResponseType.CREATE_GAME, responseData, rival.player.socket!);
   });
-  rooms.splice(indexRoom, 1);
+  console.table(rooms);
+  const indexDeleteRoom = rooms.findIndex((elem) => {
+    return elem.id == indexRoom;
+  });
+  console.log(indexDeleteRoom);
+  rooms.splice(indexDeleteRoom, 1);
+  console.table(rooms);
 }

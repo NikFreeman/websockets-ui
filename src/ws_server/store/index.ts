@@ -1,6 +1,8 @@
 import { WebSocket } from 'ws';
 import { Ships } from 'ws_server/models/ships';
 
+export const finishGame = { flag: false };
+
 export const users = new Map<string, User>();
 
 export const activeConnect = new Map<WebSocket, string>();

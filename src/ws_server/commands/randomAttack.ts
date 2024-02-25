@@ -19,16 +19,12 @@ export function randomAttack(data: string) {
       [CellState.EMPTY, CellState.DESK],
       board!,
     );
-    console.log('count->', countEmpty);
     const randomEmpty = randomNumber(1, countEmpty);
-    console.log('random->', randomEmpty);
     const pos = resolvePos(
       randomEmpty,
       [CellState.EMPTY, CellState.DESK],
       board!,
     );
-    console.log('pos->', pos);
-    console.table(board);
     const dataAttack = {
       gameId: gameId,
       x: pos.x,

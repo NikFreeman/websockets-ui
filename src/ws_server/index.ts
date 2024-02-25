@@ -16,6 +16,7 @@ import { randomAttack } from './commands/randomAttack';
 import { closeConnection } from './commands/closeConnection';
 import { updateWinners } from './commands/updateWinners';
 import { sendToEveryone } from './helpers/sendToEveryone';
+import { activeConnect, finishGame } from './store';
 
 export function wsServer(ws_port: number = 3000) {
   const wss = new WebSocketServer({ port: ws_port });
@@ -48,10 +49,16 @@ export function wsServer(ws_port: number = 3000) {
           break;
         case RequestType.ATTACK:
           attack(data);
+          if (finishGame.flag)
+            sendToEveryone(wss, ResponseType.UPDATE_WINNERS, updateWinners());
+          finishGame.flag = false;
           break;
         case RequestType.RANDOM_ATTACK:
           console.log(data);
           randomAttack(data);
+          if (finishGame.flag)
+            sendToEveryone(wss, ResponseType.UPDATE_WINNERS, updateWinners());
+          finishGame.flag = false;
           break;
         case RequestType.SINGLE_PLAY:
           console.log('bot');
@@ -60,8 +67,8 @@ export function wsServer(ws_port: number = 3000) {
           console.log(`unknown command: ${type}`);
       }
     });
-    ws.on('close', (socket: WebSocket) => {
-      closeConnection(socket);
+    ws.on('close', () => {
+      if (activeConnect.has(ws)) closeConnection(ws);
     });
 
     ws.on('error', (socket: WebSocket, error: Error) => {
