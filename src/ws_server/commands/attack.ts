@@ -1,0 +1,166 @@
+import {
+  ResponseAttackData,
+  ResponseFinishData,
+  ResponseTurnData,
+} from './../models/response_data';
+import { AttackStatus, CellState } from 'ws_server/models/board';
+import { ResponseType } from 'ws_server/models/response';
+import { games, users } from 'ws_server/store';
+import { checkKilled } from 'ws_server/helpers/checkKilled';
+import { getPositionKilledShip } from 'ws_server/helpers/getPositionKilledShip';
+import { getAroundKilledShip } from 'ws_server/helpers/getAroundKilledShip';
+import { countCellState } from 'ws_server/helpers/countCellState';
+
+import { sendToGameParticipants } from 'ws_server/helpers/sendToGameParticipants';
+import { bot } from 'ws_server/models/consts';
+import { randomAttack } from './randomAttack';
+import { addWin } from 'ws_server/helpers/addWin';
+
+export function attack(data: string) {
+  const { gameId, x, y, indexPlayer } = JSON.parse(data);
+  const indexGame = games.findIndex((elem) => elem.id === gameId);
+
+  if (indexGame != -1) {
+    if (games[indexGame]!.currentPlayer == indexPlayer) {
+      const indexRival = games[indexGame]!.rivals.findIndex(
+        (elem) => elem.player.id != indexPlayer,
+      );
+
+      const namePlayer = games[indexGame]!.rivals.find(
+        (elem) => elem.player.id == indexPlayer,
+      )!.player.name;
+
+      const idRival = games[indexGame]!.rivals[indexRival]!.player.id;
+      if (indexRival == -1) throw new Error('not Rival');
+      const board = games[indexGame]?.rivals[indexRival]?.battleField;
+      const cell = board![y]![x]!;
+      // miss
+      if (cell == CellState.EMPTY) {
+        // miss
+        board![y]![x] = CellState.MISSED;
+        games[indexGame]!.currentPlayer = idRival;
+
+        const responseAttack: ResponseAttackData = {
+          position: { x, y },
+          currentPlayer: indexPlayer,
+          status: AttackStatus.MISS,
+        };
+        sendToGameParticipants(
+          games[indexGame]!.rivals,
+          ResponseType.ATTACK,
+          responseAttack,
+        );
+
+        const responseTurn: ResponseTurnData = {
+          currentPlayer: idRival,
+        };
+        sendToGameParticipants(
+          games[indexGame]!.rivals,
+          ResponseType.TURN,
+          responseTurn,
+        );
+        if (users.has(bot.name))
+          if (games[indexGame]!.currentPlayer == users.get(bot.name!)!.id) {
+            randomAttack(
+              JSON.stringify({ gameId: gameId, indexPlayer: idRival }),
+            );
+          }
+      }
+      //Shot
+      if (cell == CellState.DESK) {
+        board![y]![x] = CellState.SHOTED;
+
+        if (checkKilled({ x, y }, board!)) {
+          const positionKilledShip = getPositionKilledShip({ x, y }, board!);
+          const positionMissAroundShip = getAroundKilledShip({ x, y }, board!);
+
+          const finish = countCellState([CellState.DESK], board!) == 0;
+
+          positionKilledShip.forEach((pos) => {
+            const responseAttack: ResponseAttackData = {
+              position: pos,
+              currentPlayer: indexPlayer,
+              status: AttackStatus.KILLED,
+            };
+            sendToGameParticipants(
+              games[indexGame]!.rivals,
+              ResponseType.ATTACK,
+              responseAttack,
+            );
+          });
+
+          positionMissAroundShip.forEach((pos) => {
+            const { x, y } = pos;
+            board![y]![x] = CellState.MISSED;
+
+            const responseAttack: ResponseAttackData = {
+              position: pos,
+              currentPlayer: indexPlayer,
+              status: AttackStatus.MISS,
+            };
+            sendToGameParticipants(
+              games[indexGame]!.rivals,
+              ResponseType.ATTACK,
+              responseAttack,
+            );
+          });
+
+          const responseTurn: ResponseTurnData = {
+            currentPlayer: indexPlayer,
+          };
+          sendToGameParticipants(
+            games[indexGame]!.rivals,
+            ResponseType.TURN,
+            responseTurn,
+          );
+          if (users.has(bot.name))
+            if (games[indexGame]!.currentPlayer == users.get(bot.name)!.id) {
+              randomAttack(
+                JSON.stringify({ gameId: gameId, indexPlayer: indexPlayer }),
+              );
+            }
+          if (finish) {
+            const responseFinish: ResponseFinishData = {
+              winPlayer: indexPlayer,
+            };
+            sendToGameParticipants(
+              games[indexGame]!.rivals,
+              ResponseType.FINISH,
+              responseFinish,
+            );
+          }
+          if (finish) {
+            addWin(namePlayer);
+            games.splice(indexGame, 1);
+          }
+        } else {
+          const responseAttack: ResponseAttackData = {
+            position: { x, y },
+            currentPlayer: indexPlayer,
+            status: AttackStatus.SHOT,
+          };
+          sendToGameParticipants(
+            games[indexGame]!.rivals,
+            ResponseType.ATTACK,
+            responseAttack,
+          );
+
+          const responseTurn = {
+            currentPlayer: indexPlayer,
+          };
+          sendToGameParticipants(
+            games[indexGame]!.rivals,
+            ResponseType.TURN,
+            responseTurn,
+          );
+          if (users.has(bot.name))
+            if (games[indexGame]!.currentPlayer == users.get(bot.name)!.id) {
+              randomAttack(
+                JSON.stringify({ gameId: gameId, indexPlayer: indexPlayer }),
+              );
+            }
+        }
+      }
+    }
+  }
+}
