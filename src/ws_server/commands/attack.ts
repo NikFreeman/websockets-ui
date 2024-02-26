@@ -19,8 +19,7 @@ import { addWin } from 'ws_server/helpers/addWin';
 export function attack(data: string) {
   const { gameId, x, y, indexPlayer } = JSON.parse(data);
   const indexGame = games.findIndex((elem) => elem.id === gameId);
-  console.log('attack', gameId, indexPlayer, indexGame);
-  console.table(games);
+
   if (indexGame != -1) {
     if (games[indexGame]!.currentPlayer == indexPlayer) {
       const indexRival = games[indexGame]!.rivals.findIndex(
