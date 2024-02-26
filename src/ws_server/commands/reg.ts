@@ -7,32 +7,37 @@ import { ERROR } from 'ws_server/models/consts';
 import { activeConnect, users } from 'ws_server/store';
 
 export function reg(data: string, socket: WebSocket | null): string {
-  const { name, password } = JSON.parse(data);
-  if (!users.has(name)) registration(name, password);
   const responseData: ResponseRegData = {
     name: '',
     index: 0,
     error: false,
     errorText: '',
   };
-  if (authentication(name, password)) {
-    const prevSocket = users.get(name)!.socket;
-    if (prevSocket) {
-      prevSocket!.close();
-    }
-
-    const user = users.get(name)!;
-    user.socket = socket;
-    users.set(name, user);
-
-    responseData.name = users.get(name)!.name;
-    responseData.index = users.get(name)!.id;
-    if (socket) activeConnect.set(socket, users.get(name)!.name);
-  } else {
+  const { name, password } = JSON.parse(data);
+  if ((name as string).length < 5 || (password as string).length < 5) {
     responseData.error = true;
-    responseData.errorText = ERROR.LOGIN;
-  }
+    responseData.errorText = ERROR.LOGIN_OR_PASS_LESS;
+  } else {
+    if (!users.has(name)) registration(name, password);
 
+    if (authentication(name, password)) {
+      const prevSocket = users.get(name)!.socket;
+      if (prevSocket) {
+        prevSocket!.close();
+      }
+
+      const user = users.get(name)!;
+      user.socket = socket;
+      users.set(name, user);
+
+      responseData.name = users.get(name)!.name;
+      responseData.index = users.get(name)!.id;
+      if (socket) activeConnect.set(socket, users.get(name)!.name);
+    } else {
+      responseData.error = true;
+      responseData.errorText = ERROR.LOGIN;
+    }
+  }
   const answer = JSON.stringify(responseData);
   return answer;
 }

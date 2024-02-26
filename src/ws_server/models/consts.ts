@@ -1,10 +1,11 @@
 export enum ERROR {
   HASH = 'Error generate hash value',
   LOGIN = 'Login already exists',
+  LOGIN_OR_PASS_LESS = 'Login or password less 5 letter',
 }
 
 export enum MESSAGE {
-  START_SERVER = 'Start websoket server on the PORT port!',
+  START_SERVER = 'Start websocket server on ',
   NEW_CLIENT = 'New client connected',
 }
 

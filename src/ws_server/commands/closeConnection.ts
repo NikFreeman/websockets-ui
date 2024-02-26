@@ -7,7 +7,7 @@ import { ResponseType } from 'ws_server/models/response';
 import { updateWinners } from './updateWinners';
 
 export function closeConnection(socket: WebSocket) {
-  console.log('close connection');
+  console.log('The connection closed');
   const name = activeConnect.get(socket);
   const user = users.get(name!)!;
   user.socket = null;
@@ -22,7 +22,7 @@ export function closeConnection(socket: WebSocket) {
   const nameWinner = games[indexDeleteGame]?.rivals.filter(
     (rival) => rival.player.name != user.name,
   )[0]!.player.name!;
-  console.log('close nameWin', nameWinner);
+
   if (indexDeleteGame != -1) {
     addWin(nameWinner);
     const winner = users.get(nameWinner);
