@@ -16,7 +16,15 @@ export function reg(data: string, socket: WebSocket | null): string {
     errorText: '',
   };
   if (authentication(name, password)) {
-    users.get(name)!['socket'] = socket;
+    const prevSocket = users.get(name)!.socket;
+    if (prevSocket) {
+      prevSocket!.close();
+    }
+
+    const user = users.get(name)!;
+    user.socket = socket;
+    users.set(name, user);
+
     responseData.name = users.get(name)!.name;
     responseData.index = users.get(name)!.id;
     if (socket) activeConnect.set(socket, users.get(name)!.name);

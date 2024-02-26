@@ -1,4 +1,4 @@
-import { MESSAGE } from './models/consts';
+import { MESSAGE, bot } from './models/consts';
 import { WebSocketServer, WebSocket } from 'ws';
 
 import { RequestType } from './models/request';
@@ -25,7 +25,7 @@ export function wsServer(ws_port: number = 3000) {
     console.log(MESSAGE.NEW_CLIENT);
     ws.on('message', (message: string) => {
       const { type, data } = JSON.parse(message);
-
+      console.log(type, data);
       switch (type) {
         case RequestType.REG:
           const response = reg(data, ws);
@@ -41,9 +41,10 @@ export function wsServer(ws_port: number = 3000) {
 
         case RequestType.ADD_USER:
           const { indexRoom } = JSON.parse(data);
-          addUser(indexRoom, ws);
-          sendToEveryone(wss, ResponseType.UPDATE_ROOM, updateRooms());
-          createGame(indexRoom);
+          if (addUser(indexRoom, ws)) {
+            sendToEveryone(wss, ResponseType.UPDATE_ROOM, updateRooms());
+            createGame(indexRoom);
+          }
           break;
         case RequestType.ADD_SHIPS:
           addShips(data);
@@ -55,14 +56,13 @@ export function wsServer(ws_port: number = 3000) {
           finishGame.flag = false;
           break;
         case RequestType.RANDOM_ATTACK:
-          console.log(data);
           randomAttack(data);
           if (finishGame.flag)
             sendToEveryone(wss, ResponseType.UPDATE_WINNERS, updateWinners());
           finishGame.flag = false;
           break;
         case RequestType.SINGLE_PLAY:
-          console.log('bot');
+          console.log(bot.name);
           createRoom(ws);
           addBot(ws);
           break;

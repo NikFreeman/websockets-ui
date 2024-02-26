@@ -8,7 +8,11 @@ export function updateWinners(): string {
       wins: users.wins,
     });
   });
-  const responseData = JSON.stringify(winners);
+  const responseData = JSON.stringify(
+    winners.sort((a, b) => {
+      return b.wins - a.wins;
+    }),
+  );
 
   return responseData;
 }
