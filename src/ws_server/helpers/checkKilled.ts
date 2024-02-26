@@ -8,7 +8,7 @@ export function checkKilled(
   const board = JSON.parse(JSON.stringify(realBoard));
   const { x, y } = position;
   board[y][x] = -1;
-  
+
   if (y > 0) {
     if (board![y - 1]![x] == CellState.DESK) {
       return false;

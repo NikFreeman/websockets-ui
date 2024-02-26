@@ -7,11 +7,10 @@
     "scripts": {
         "start": "tsx ./index.js",
         "start:dev": "tsx watch ./index.js",
-        "format": "prettier --write \"src/**/*.ts\"",
-        "lint": "eslint \"src/**/*.ts\" --fix",
+        "format": "prettier --write \"src/**/*.ts\"",        
         "test": "jest --silent",
-        "test:verbose": "jest",
-        "test:math": "jest -i src/ws_server/helpers/checkKilled.test.ts -t \"checkKilled function\""
+        "test:verbose": "jest"
+        
     },
     "author": "Andrei Auchynnikau",
     "keywords": [],
